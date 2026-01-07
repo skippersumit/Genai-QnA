@@ -22,4 +22,12 @@ public class LlmTestController {
     ) throws Exception {
         return ResponseEntity.ok(llmService.testCall(prompt));
     }
+
+    @GetMapping("/structured-test")
+    public ResponseEntity<String> structuredTest(
+            @RequestParam String question
+    ) throws Exception {
+        String response = llmService.testStructuredCall(question);
+        return ResponseEntity.ok(response);
+    }
 }
