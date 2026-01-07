@@ -84,19 +84,7 @@ Interviewers LOVE clear non-goals.
 ### 6. Architecture Diagram (Required)
 **“Document ingestion and embedding happen asynchronously to avoid blocking user uploads.”**
 
-
-```
-Client
-  |
-  v
-API Service (Spring Boot)
-  |
-  |---> Metadata DB (Postgres)
-  |
-  |---> Vector Store
-  |
-  |---> LLM Provider
-```
+![img.png](ArchitectureDiagram.png)
 
 ---
 
