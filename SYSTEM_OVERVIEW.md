@@ -2,7 +2,9 @@
 
 **What problem are we solving?**
 
-Today, users have large documents (PDFs, notes, logs, design docs) and want quick, accurate answers without manually searching or reading everything. Existing tools are either generic chatbots or lack backend control, observability, and security.
+Today, users have large documents (PDFs, notes, logs, design docs) and want quick, accurate answers without manually
+searching or reading everything. Existing tools are either generic chatbots or lack backend control, observability, and
+security.
 
 This system allows users to:
 
@@ -24,8 +26,6 @@ Secondary users:
 
     Admins (monitor usage, cost, performance)
 
-
-
 ### **3. Non-Goals (Very Important for Interviews)**
 
 Explicitly out of scope for v1:
@@ -37,7 +37,6 @@ Explicitly out of scope for v1:
     * No frontend UI (backend only)
 
 Interviewers LOVE clear non-goals.
-
 
 ### 4. High-Level Features
 
@@ -82,6 +81,7 @@ Interviewers LOVE clear non-goals.
 ---
 
 ### 6. Architecture Diagram (Required)
+
 **“Document ingestion and embedding happen asynchronously to avoid blocking user uploads.”**
 
 ![img.png](ArchitectureDiagram.png)
@@ -116,3 +116,21 @@ How do we know this system is working?
 * Hallucination rate minimized via strict context grounding
 * Embedding cost per document tracked
 * System supports 100 concurrent users
+
+### Docker commands
+
+#### pull the image and start the container in the background.
+
+```
+docker run -d `
+  --name ollama `
+-v ollama:/root/.ollama `
+  -p 11434:11434 `
+ollama/ollama
+```
+
+#### Download the Embedding Model
+
+```
+docker exec -it ollama ollama run nomic-embed-text
+```
