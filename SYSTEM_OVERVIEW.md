@@ -134,3 +134,10 @@ ollama/ollama
 ```
 docker exec -it ollama ollama run nomic-embed-text
 ```
+
+### Vector db
+
+```
+docker run -p 6333:6333 qdrant/qdrant
+http://localhost:6333 // confirm with this
+```
