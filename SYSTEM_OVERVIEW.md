@@ -122,11 +122,7 @@ How do we know this system is working?
 #### pull the image and start the container in the background.
 
 ```
-docker run -d `
-  --name ollama `
--v ollama:/root/.ollama `
-  -p 11434:11434 `
-ollama/ollama
+docker run -d   --name ollama -v ollama:/root/.ollama   -p 11434:11434 ollama/ollama
 ```
 
 #### Download the Embedding Model

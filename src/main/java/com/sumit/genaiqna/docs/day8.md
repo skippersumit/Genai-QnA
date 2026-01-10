@@ -71,10 +71,7 @@ Reasons:
 ### Run Qdrant
 
 ```bash
-docker run -d \
-  --name qdrant \
-  -p 6333:6333 \
-  qdrant/qdrant
+docker run -d  --name qdrant   -p 6333:6333   qdrant/qdrant
 ```
 
 ---
