@@ -2,8 +2,11 @@ package com.sumit.genaiqna.service;
 
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.sumit.genaiqna.service.vector.VectorStoreService;
+import com.sumit.genaiqna.util.Stopwatch;
 import jakarta.annotation.PostConstruct;
 import okhttp3.*;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 import org.springframework.stereotype.Service;
 
 import java.io.IOException;
@@ -13,6 +16,10 @@ import java.util.Map;
 
 @Service
 public class QdrantVectorStoreService implements VectorStoreService {
+
+    private static final Logger log = LoggerFactory.getLogger(QdrantVectorStoreService.class);
+
+
     private static final String QDRANT_URL = "http://localhost:6333";
     private static final String COLLECTION = "documents";
 
@@ -83,6 +90,8 @@ public class QdrantVectorStoreService implements VectorStoreService {
     @Override
     public List<Map<String, Object>> search(float[] queryVector, int topK) {
         // implemented below
+        Stopwatch sw = Stopwatch.start();
+
         String body = """
                 {
                   "vector": %s,
@@ -100,6 +109,9 @@ public class QdrantVectorStoreService implements VectorStoreService {
 
         try (Response response = client.newCall(request).execute()) {
             String json = response.body().string();
+            long timeMs = sw.elapsedMillis();
+            log.info("SearchService latency (query+vector search): {} ms", timeMs);
+
             return List.of(Map.of("raw", json));
         } catch (IOException e) {
             throw new RuntimeException(e);

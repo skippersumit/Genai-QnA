@@ -29,13 +29,14 @@ public class SearchService {
     public List<Map<String, Object>> search(String query, int topK) {
 
         // 1️⃣ Generate embedding for query
-        String embeddingJson = null;
+        float[] queryVector;
         try {
-            embeddingJson = embeddingService.embed(query);
+            queryVector = embeddingService.embedWithTiming(query);
+
         } catch (IOException e) {
             throw new RuntimeException(e);
         }
-        float[] queryVector = EmbeddingParser.extractVector(embeddingJson);
+//        float[] queryVector = EmbeddingParser.extractVector(embeddingJson);
 
         // 2️⃣ Search vector DB
         List<Map<String, Object>> rawResults =

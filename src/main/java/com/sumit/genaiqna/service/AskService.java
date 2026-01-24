@@ -1,5 +1,7 @@
 package com.sumit.genaiqna.service;
 
+import com.sumit.genaiqna.util.Stopwatch;
+import org.slf4j.LoggerFactory;
 import org.springframework.stereotype.Service;
 
 import java.io.IOException;
@@ -8,6 +10,8 @@ import java.util.Map;
 
 @Service
 public class AskService {
+    private static final org.slf4j.Logger log = LoggerFactory.getLogger(QdrantVectorStoreService.class);
+
 
     private final SearchService searchService;
     private final LlmService llmService;
@@ -22,6 +26,7 @@ public class AskService {
 
 
     public Map<String, Object> ask(String query, int topK) throws IOException {
+        Stopwatch total = Stopwatch.start();
 
         List<Map<String, Object>> chunks =
                 searchService.search(query, topK);
@@ -30,6 +35,8 @@ public class AskService {
 
         Map<String, Object> llmResult =
                 llmService.generate(prompt);
+        long totalMs = total.elapsedMillis();
+        log.info("Total /ask latency: {} ms", totalMs);
 
         String answer = (String) llmResult.get("answer");
 
