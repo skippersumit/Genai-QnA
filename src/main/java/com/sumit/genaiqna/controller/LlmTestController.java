@@ -1,6 +1,6 @@
 package com.sumit.genaiqna.controller;
 
-import com.sumit.genaiqna.service.LlmService;
+import com.sumit.genaiqna.service.llm.LlmClient;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.RequestMapping;
@@ -12,24 +12,24 @@ import java.util.Map;
 @RestController
 @RequestMapping("/llm")
 public class LlmTestController {
-    private final LlmService llmService;
+    private final LlmClient llmClient;
 
-    public LlmTestController(LlmService llmService) {
-        this.llmService = llmService;
+    public LlmTestController(LlmClient llmClient) {
+        this.llmClient = llmClient;
     }
 
     @GetMapping("/test")
     public ResponseEntity<String> testLlm(
             @RequestParam(defaultValue = "Say hello from LLM") String prompt
     ) throws Exception {
-        return ResponseEntity.ok(llmService.testCall(prompt));
+        return ResponseEntity.ok(llmClient.testCall(prompt));
     }
 
     @GetMapping("/structured-test")
     public ResponseEntity<String> structuredTest(
             @RequestParam String question
     ) throws Exception {
-        Map<String, Object> response = llmService.generate(question);
+        Map<String, Object> response = llmClient.generate(question);
         return ResponseEntity.ok(response.toString());
     }
 }

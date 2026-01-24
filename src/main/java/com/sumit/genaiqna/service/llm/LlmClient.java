@@ -1,4 +1,4 @@
-package com.sumit.genaiqna.service;
+package com.sumit.genaiqna.service.llm;
 
 import com.fasterxml.jackson.databind.JsonNode;
 import com.fasterxml.jackson.databind.ObjectMapper;
@@ -13,7 +13,7 @@ import java.util.List;
 import java.util.Map;
 
 @Service
-public class LlmService {
+public class LlmClient {
     private static final String GROQ_URL =
             "https://api.groq.com/openai/v1/chat/completions";
 

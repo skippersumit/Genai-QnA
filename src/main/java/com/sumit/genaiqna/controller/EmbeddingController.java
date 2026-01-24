@@ -1,6 +1,6 @@
 package com.sumit.genaiqna.controller;
 
-import com.sumit.genaiqna.service.EmbeddingService;
+import com.sumit.genaiqna.service.embedding.EmbeddingService;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestBody;

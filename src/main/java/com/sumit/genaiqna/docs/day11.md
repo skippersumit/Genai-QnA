@@ -112,7 +112,7 @@ public Map<String, Object> ask(String query, int topK) {
     String prompt = buildPrompt(query, chunks);
 
     // Step 3: Generate answer via LLM
-    String answer = llmService.generate(prompt);
+    String answer = llmClient.generate(prompt);
 
     // Step 4: Attach sources
     List<Map<String, Object>> sources = chunks.stream()
@@ -197,7 +197,7 @@ The fix was applied in the **LLM integration layer**, not in:
 * Controller ❌
 * AskService ❌
 
-### 📁 `LlmService.generate()`
+### 📁 `LlmClient.generate()`
 
 ```java
 public String generate(String prompt) {

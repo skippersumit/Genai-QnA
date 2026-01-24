@@ -1,6 +1,7 @@
 package com.sumit.genaiqna.service;
 
 
+import com.sumit.genaiqna.service.embedding.EmbeddingService;
 import com.sumit.genaiqna.service.vector.VectorStoreService;
 import org.springframework.stereotype.Service;
 

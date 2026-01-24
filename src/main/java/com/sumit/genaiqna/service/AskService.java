@@ -1,5 +1,6 @@
 package com.sumit.genaiqna.service;
 
+import com.sumit.genaiqna.service.llm.LlmClient;
 import com.sumit.genaiqna.util.Stopwatch;
 import org.slf4j.LoggerFactory;
 import org.springframework.stereotype.Service;
@@ -14,14 +15,14 @@ public class AskService {
 
 
     private final SearchService searchService;
-    private final LlmService llmService;
+    private final LlmClient llmClient;
 
     public AskService(
             SearchService searchService,
-            LlmService llmService
+            LlmClient llmClient
     ) {
         this.searchService = searchService;
-        this.llmService = llmService;
+        this.llmClient = llmClient;
     }
 
 
@@ -34,7 +35,7 @@ public class AskService {
         String prompt = buildPrompt(query, chunks);
 
         Map<String, Object> llmResult =
-                llmService.generate(prompt);
+                llmClient.generate(prompt);
         long totalMs = total.elapsedMillis();
         log.info("Total /ask latency: {} ms", totalMs);
 
