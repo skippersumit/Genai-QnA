@@ -1,5 +1,7 @@
 package com.sumit.genaiqna.service;
 
+import com.fasterxml.jackson.databind.JsonNode;
+import com.fasterxml.jackson.databind.ObjectMapper;
 import com.sumit.genaiqna.service.prompt.OutputSchema;
 import com.sumit.genaiqna.service.prompt.SystemPrompt;
 import okhttp3.*;
@@ -43,7 +45,7 @@ public class LlmService {
         }
     }
 
-    public String testStructuredCall(String question) throws IOException {
+    public String generate(String question) throws IOException {
         String escapedQuestion = question
                 .replace("\\", "\\\\")   // Escape backslashes first
                 .replace("\"", "\\\"")   // Escape double quotes
@@ -78,7 +80,23 @@ public class LlmService {
                 .build();
 
         try (Response response = client.newCall(request).execute()) {
-            return response.body().string();
+            String rawResponse = response.body().string();
+            ObjectMapper mapper = new ObjectMapper();
+            JsonNode root = mapper.readTree(rawResponse);
+
+            // Step 1: extract message content
+            String content =
+                    root.get("choices")
+                            .get(0)
+                            .get("message")
+                            .get("content")
+                            .asText();
+
+            // Step 2: parse structured JSON inside content
+            JsonNode structured = mapper.readTree(content);
+
+            // Step 3: return only the final answer
+            return structured.get("answer").asText();
         }
     }
 

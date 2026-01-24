@@ -27,7 +27,7 @@ public class LlmTestController {
     public ResponseEntity<String> structuredTest(
             @RequestParam String question
     ) throws Exception {
-        String response = llmService.testStructuredCall(question);
+        String response = llmService.generate(question);
         return ResponseEntity.ok(response);
     }
 }
