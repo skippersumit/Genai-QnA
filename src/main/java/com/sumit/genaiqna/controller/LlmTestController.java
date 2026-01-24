@@ -7,6 +7,8 @@ import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.RestController;
 
+import java.util.Map;
+
 @RestController
 @RequestMapping("/llm")
 public class LlmTestController {
@@ -27,7 +29,7 @@ public class LlmTestController {
     public ResponseEntity<String> structuredTest(
             @RequestParam String question
     ) throws Exception {
-        String response = llmService.generate(question);
-        return ResponseEntity.ok(response);
+        Map<String, Object> response = llmService.generate(question);
+        return ResponseEntity.ok(response.toString());
     }
 }

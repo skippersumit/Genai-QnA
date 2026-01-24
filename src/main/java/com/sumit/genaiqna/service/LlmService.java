@@ -9,6 +9,8 @@ import org.springframework.beans.factory.annotation.Value;
 import org.springframework.stereotype.Service;
 
 import java.io.IOException;
+import java.util.List;
+import java.util.Map;
 
 @Service
 public class LlmService {
@@ -45,7 +47,7 @@ public class LlmService {
         }
     }
 
-    public String generate(String question) throws IOException {
+    public Map<String, Object> generate(String question) throws IOException {
         String escapedQuestion = question
                 .replace("\\", "\\\\")   // Escape backslashes first
                 .replace("\"", "\\\"")   // Escape double quotes
@@ -96,7 +98,14 @@ public class LlmService {
             JsonNode structured = mapper.readTree(content);
 
             // Step 3: return only the final answer
-            return structured.get("answer").asText();
+            return Map.of(
+                    "answer", structured.get("answer").asText(),
+                    "citations", mapper.convertValue(
+                            structured.get("citations"), List.class
+                    )
+            );
+        } catch (Exception e) {
+            throw new RuntimeException("Failed to parse grounded LLM response", e);
         }
     }
 
