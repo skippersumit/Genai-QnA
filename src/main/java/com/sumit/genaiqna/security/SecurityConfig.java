@@ -1,4 +1,4 @@
-package com.sumit.genaiqna.security.security;
+package com.sumit.genaiqna.security;
 
 
 import org.springframework.context.annotation.Bean;

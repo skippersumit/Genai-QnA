@@ -1,5 +1,6 @@
 package com.sumit.genaiqna.security;
 
+import com.sumit.genaiqna.controller.RateLimiter;
 import jakarta.servlet.FilterChain;
 import jakarta.servlet.ServletException;
 import jakarta.servlet.http.HttpServletRequest;
@@ -13,8 +14,14 @@ import java.io.IOException;
 @Component
 public class ApiKeyAuthFilter extends OncePerRequestFilter {
 
+    private final RateLimiter rateLimiter;
+
     @Value("${security.api-key}")
     private String expectedApiKey;
+
+    public ApiKeyAuthFilter(RateLimiter rateLimiter) {
+        this.rateLimiter = rateLimiter;
+    }
 
     @Override
     protected void doFilterInternal(
@@ -40,6 +47,13 @@ public class ApiKeyAuthFilter extends OncePerRequestFilter {
             response.getWriter().write("Unauthorized");
             return;
         }
+
+        if (!rateLimiter.allowRequest(apiKey)) {
+            response.setStatus(429);
+            response.getWriter().write("Too Many Requests");
+            return;
+        }
+
 
         filterChain.doFilter(request, response);
     }
