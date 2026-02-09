@@ -3,6 +3,9 @@ package com.sumit.genaiqna.service;
 import com.sumit.genaiqna.service.llm.LlmClient;
 import com.sumit.genaiqna.util.Stopwatch;
 import org.slf4j.LoggerFactory;
+import org.springframework.cache.Cache;
+import org.springframework.cache.CacheManager;
+import org.springframework.cache.annotation.Cacheable;
 import org.springframework.stereotype.Service;
 
 import java.io.IOException;
@@ -11,22 +14,29 @@ import java.util.Map;
 
 @Service
 public class AskService {
-    private static final org.slf4j.Logger log = LoggerFactory.getLogger(QdrantVectorStoreService.class);
+    private static final org.slf4j.Logger log = LoggerFactory.getLogger(AskService.class);
 
+    private final CacheManager cacheManager;
 
     private final SearchService searchService;
     private final LlmClient llmClient;
 
     public AskService(
-            SearchService searchService,
+            CacheManager cacheManager, SearchService searchService,
             LlmClient llmClient
     ) {
+        this.cacheManager = cacheManager;
         this.searchService = searchService;
         this.llmClient = llmClient;
     }
 
-
+    @Cacheable(
+            value = "askResponses",
+            key = "#query + ':' + #topK"
+    )
     public Map<String, Object> ask(String query, int topK) throws IOException {
+        log.info("CACHE MISS → executing /ask for query='{}'", query);
+
         Stopwatch total = Stopwatch.start();
 
         List<Map<String, Object>> chunks =
@@ -36,6 +46,7 @@ public class AskService {
 
         Map<String, Object> llmResult =
                 llmClient.generate(prompt);
+
         long totalMs = total.elapsedMillis();
         log.info("Total /ask latency: {} ms", totalMs);
 
@@ -63,6 +74,12 @@ public class AskService {
                 "answer", answer,
                 "sources", sources
         );
+    }
+
+    public boolean isCached(String query, int topK) {
+        Cache cache = cacheManager.getCache("askResponses");
+        return cache != null &&
+                cache.get(query + ":" + topK) != null;
     }
 
 

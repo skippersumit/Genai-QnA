@@ -1,6 +1,7 @@
 package com.sumit.genaiqna.controller;
 
 import com.sumit.genaiqna.service.AskService;
+import org.slf4j.LoggerFactory;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestBody;
@@ -13,6 +14,7 @@ import java.util.Map;
 @RestController
 @RequestMapping("/ask")
 public class AskController {
+    private static final org.slf4j.Logger log = LoggerFactory.getLogger(AskController.class);
 
     private final AskService askService;
 
@@ -26,6 +28,10 @@ public class AskController {
     ) throws IOException {
         String query = (String) body.get("query");
         int topK = body.get("topK") == null ? 3 : (int) body.get("topK");
+
+        if (askService.isCached(query, topK)) {
+            log.info("CACHE HIT for /ask");
+        }
 
         return ResponseEntity.ok(
                 askService.ask(query, topK)

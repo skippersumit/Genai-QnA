@@ -4,6 +4,7 @@ import com.sumit.genaiqna.service.EmbeddingParser;
 import com.sumit.genaiqna.util.Stopwatch;
 import okhttp3.*;
 import org.slf4j.LoggerFactory;
+import org.springframework.cache.annotation.Cacheable;
 import org.springframework.stereotype.Service;
 
 import java.io.IOException;
@@ -39,7 +40,12 @@ public class EmbeddingService {
         }
     }
 
+    @Cacheable(
+            value = "embeddings",
+            key = "#text"
+    )
     public float[] embedWithTiming(String text) throws IOException {
+        log.info("Embedding cache MISS for text hash={}", text.hashCode());
 
         Stopwatch sw = Stopwatch.start();
 
@@ -47,7 +53,7 @@ public class EmbeddingService {
         float[] vector = EmbeddingParser.extractVector(embeddingJson);
 
         long timeMs = sw.elapsedMillis();
-        log.info("Embedding latency: {{} } ms", timeMs);
+        log.info("Embedding computed in {} ms", sw.elapsedMillis());
 
         return vector;
     }
