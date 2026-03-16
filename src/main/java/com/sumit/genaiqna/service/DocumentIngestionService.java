@@ -1,6 +1,7 @@
 package com.sumit.genaiqna.service;
 
 
+import com.sumit.genaiqna.ingestion.IngestionJob;
 import com.sumit.genaiqna.service.embedding.EmbeddingService;
 import com.sumit.genaiqna.service.vector.VectorStoreService;
 import org.springframework.stereotype.Service;
@@ -35,12 +36,12 @@ public class DocumentIngestionService {
             String chunk = chunks.get(i);
 
             String embeddingJson = null;
+            float[] vector = null;
             try {
-                embeddingJson = embeddingService.embed(chunk);
+                vector = embeddingService.embedWithTiming(chunk);
             } catch (IOException e) {
                 throw new RuntimeException(e);
             }
-            float[] vector = EmbeddingParser.extractVector(embeddingJson);
 
             vectorStoreService.upsert(
                     UUID.randomUUID().toString(),
@@ -68,4 +69,32 @@ public class DocumentIngestionService {
 
         return chunks;
     }
+
+    public void process(IngestionJob job) throws IOException {
+
+        // 1. Chunk document
+        List<String> chunks = chunkText(job.content(), 300);
+
+        // 2. Embed + store
+        for (int i = 0; i < chunks.size(); i++) {
+            float[] vector;
+            try {
+                vector = embeddingService.embedWithTiming(chunks.get(i));
+            } catch (IOException e) {
+                throw new RuntimeException("Failed to embed chunk " + i + " for doc " + job.documentId(), e);
+            }
+
+            String pointId = UUID.randomUUID().toString();
+            vectorStoreService.upsert(
+                    pointId,
+                    vector,
+                    Map.of(
+                            "documentId", job.documentId().toString(),
+                            "chunkIndex", i,
+                            "text", chunks.get(i)
+                    )
+            );
+        }
+    }
+
 }

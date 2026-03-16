@@ -19,11 +19,11 @@ public class EmbeddingController {
     }
 
     @PostMapping
-    public ResponseEntity<String> embed(
+    public ResponseEntity<float[]> embed(
             @RequestBody Map<String, String> body
     ) throws Exception {
         return ResponseEntity.ok(
-                embeddingService.embed(body.get("text"))
+                embeddingService.embedWithTiming(body.get("text"))
         );
     }
 }

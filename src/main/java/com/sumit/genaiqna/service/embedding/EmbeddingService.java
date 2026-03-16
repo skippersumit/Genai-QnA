@@ -18,7 +18,7 @@ public class EmbeddingService {
     private final OkHttpClient client = new OkHttpClient();
 
 
-    public String embed(String text) throws IOException {
+    private String embed(String text) throws IOException {
 
         String requestBody = """
                 {

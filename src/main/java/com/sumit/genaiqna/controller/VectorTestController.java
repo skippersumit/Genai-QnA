@@ -1,6 +1,5 @@
 package com.sumit.genaiqna.controller;
 
-import com.sumit.genaiqna.service.EmbeddingParser;
 import com.sumit.genaiqna.service.embedding.EmbeddingService;
 import com.sumit.genaiqna.service.vector.VectorStoreService;
 import org.springframework.http.ResponseEntity;
@@ -31,9 +30,8 @@ public class VectorTestController {
 
         // 1️⃣ Generate embedding for insert text
         String insertText = "Spring Boot is a Java framework";
-        String insertEmbeddingJson = embeddingService.embed(insertText);
         float[] insertVector =
-                EmbeddingParser.extractVector(insertEmbeddingJson);
+                embeddingService.embedWithTiming(insertText);
 
         // 2️⃣ Insert into Qdrant
         String pointId = UUID.randomUUID().toString();
@@ -47,9 +45,8 @@ public class VectorTestController {
 
         // 3️⃣ Generate embedding for query text
         String queryText = "Java backend framework";
-        String queryEmbeddingJson = embeddingService.embed(queryText);
-        float[] queryVector =
-                EmbeddingParser.extractVector(queryEmbeddingJson);
+
+        float[] queryVector = embeddingService.embedWithTiming(queryText);
 
         // 4️⃣ Search in Qdrant
         var results = vectorStoreService.search(queryVector, 1);
