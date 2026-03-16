@@ -1,0 +1,317 @@
+
+GENAI DOCUMENT Q&A BACKEND PROJECT – CHAT BACKUP SUMMARY
+========================================================
+
+This file is a consolidated backup of the conversation-driven development process
+for building the GenAI Document Q&A backend system. It summarizes the daily work,
+design decisions, architecture evolution, and backend engineering concepts learned
+through the process.
+
+Project Stack
+-------------
+Java 17
+Spring Boot 3
+Ollama / Groq LLM
+Qdrant Vector DB
+Redis (Caching)
+Docker
+PostgreSQL (metadata – optional)
+Executor + Queue pattern for async ingestion
+
+---------------------------------------------------------
+DAY 1 – System Design & Scope
+---------------------------------------------------------
+Defined the problem: Users want to query large documents using natural language.
+
+System goals:
+• Upload documents
+• Chunk text
+• Generate embeddings
+• Store vectors
+• Query documents via semantic search
+• Use LLM to generate grounded answers
+
+Non-goals:
+• No fine-tuning
+• No multi-tenant auth
+• No UI
+• No multimodal support
+
+High-level architecture:
+Client → Spring Boot API → Embedding Service → Vector DB → LLM
+
+---------------------------------------------------------
+DAY 2 – Spring Boot Project Skeleton
+---------------------------------------------------------
+Created the base project with:
+
+• Controller layer
+• Service layer
+• Repository structure
+• Exception handling
+• Health endpoint
+
+Goal: establish backend project structure.
+
+---------------------------------------------------------
+DAY 3 – API Design
+---------------------------------------------------------
+Designed REST APIs:
+
+POST /documents/upload
+POST /search
+POST /ask
+GET /documents/{id}
+
+Swagger/OpenAPI enabled.
+
+---------------------------------------------------------
+DAY 4 – LLM Integration
+---------------------------------------------------------
+Connected backend to LLM API using Groq/Ollama.
+
+Implemented endpoint:
+GET /llm/test
+
+Learned:
+• Tokens
+• Prompt vs completion
+• Temperature
+• Context window
+
+---------------------------------------------------------
+DAY 5 – Prompt Engineering
+---------------------------------------------------------
+Introduced structured prompts.
+
+Example output format:
+
+{
+  "answer": "...",
+  "confidence": "HIGH"
+}
+
+Goal: deterministic machine-readable responses.
+
+---------------------------------------------------------
+DAY 6 – Embeddings
+---------------------------------------------------------
+Implemented text embeddings using local Ollama model:
+
+Model:
+nomic-embed-text
+
+Endpoint:
+POST /embed
+
+Output:
+768-dimension vector.
+
+Concept learned:
+Semantic vector representation.
+
+---------------------------------------------------------
+DAY 7 – Week 1 Integration
+---------------------------------------------------------
+Cleaned codebase and documented:
+
+• Architecture
+• APIs
+• Tech stack
+• Week 1 learning
+
+---------------------------------------------------------
+DAY 8 – Vector Database
+---------------------------------------------------------
+Integrated Qdrant.
+
+Operations:
+• Insert vector
+• Search vector
+
+Collection configuration:
+
+Vector size: 768
+Distance: Cosine similarity
+
+---------------------------------------------------------
+DAY 9 – Document Ingestion Pipeline
+---------------------------------------------------------
+Built ingestion flow:
+
+Document
+→ Chunk text
+→ Generate embeddings
+→ Store vectors
+
+Endpoint:
+POST /documents/ingest
+
+---------------------------------------------------------
+DAY 10 – Similarity Search
+---------------------------------------------------------
+Implemented semantic retrieval.
+
+Endpoint:
+POST /search
+
+Flow:
+Query → embedding → vector search → top‑K chunks
+
+---------------------------------------------------------
+DAY 11 – RAG Implementation
+---------------------------------------------------------
+Combined:
+
+User Query
++ Retrieved Context
++ LLM Prompt
+
+Endpoint:
+POST /ask
+
+Output:
+Answer + sources
+
+---------------------------------------------------------
+DAY 12 – Hallucination Control
+---------------------------------------------------------
+Improved reliability:
+
+• Strict prompt rules
+• Structured JSON output
+• Source citation
+• Fallback: “I don’t know”
+
+Goal: grounded responses.
+
+---------------------------------------------------------
+DAY 13 – Performance Benchmarking
+---------------------------------------------------------
+Measured latency.
+
+Example results:
+
+Embedding latency: ~41 ms
+Vector search latency: ~12 ms
+Total /ask latency: ~374 ms
+
+Insight:
+LLM generation dominates latency.
+
+---------------------------------------------------------
+DAY 14 – Week 2 Hardening
+---------------------------------------------------------
+Refactoring:
+
+• Clean service boundaries
+• Removed debug code
+• Separated adapters
+• Updated architecture diagram
+
+---------------------------------------------------------
+DAY 15 – Authentication
+---------------------------------------------------------
+Implemented API key authentication.
+
+Header:
+X-API-KEY
+
+Filter-based validation.
+
+Protected endpoints:
+/ask
+/search
+/documents
+
+---------------------------------------------------------
+DAY 16 – Rate Limiting
+---------------------------------------------------------
+Added protection against abuse.
+
+Strategy:
+20 requests per minute per API key.
+
+Response on exceed:
+HTTP 429 Too Many Requests
+
+---------------------------------------------------------
+DAY 17 – Redis Caching
+---------------------------------------------------------
+Integrated Redis caching.
+
+Cached:
+• Embeddings
+• /ask responses
+
+Impact:
+Cold request: ~830 ms
+Cached request: ~10–20 ms
+
+Huge latency improvement.
+
+---------------------------------------------------------
+DAY 18 – Async Processing
+---------------------------------------------------------
+Converted ingestion to async pipeline.
+
+Upload API:
+POST /documents/ingest
+Returns:
+202 Accepted
+
+Processing pipeline:
+
+Upload
+→ enqueue job
+→ background worker
+→ chunk
+→ embed
+→ store vectors
+
+Technologies:
+BlockingQueue
+ExecutorService
+
+---------------------------------------------------------
+
+SYSTEM ARCHITECTURE (CURRENT)
+---------------------------------------------------------
+
+Client
+   |
+   v
+Spring Boot API
+   |
+   |--- Authentication (API Key)
+   |--- Rate Limiting
+   |
+   v
+Ask Service
+   |
+   |--- Redis Cache
+   |--- Embedding Service
+   |--- Qdrant Vector DB
+   |--- LLM Client
+   |
+   v
+Grounded Answer
+
+Async ingestion pipeline:
+
+Upload API
+   |
+   v
+Ingestion Queue
+   |
+   v
+Background Worker
+   |
+   v
+Embedding + Vector Store
+
+---------------------------------------------------------
+
+This file represents the backup summary of the project development conversation
+up to Day 18.
+
